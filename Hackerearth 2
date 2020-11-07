@@ -1,0 +1,90 @@
+#include <iostream>
+#include <queue>
+using namespace std;
+
+#define ADJ 8
+
+int T;	// 테스트케이스 수
+int map[1000][1000];
+int N, M;	// 지도의 세로, 가로 너비
+int X;	// 분대 수
+int Y;	// 최대 병사 수
+
+int xpos[ADJ] = { -1, -1, -1, 0, 1, 1, 1, 0 };
+int ypos[ADJ] = { -1, 0, 1, 1, 1, 0, -1, -1 };
+
+bool in_range(int x, int y) {
+	if (x < 0 || x >= N || y < 0 || y >= M) return false;
+	else return true;
+}
+
+void print_map() {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			cout << map[i][j] << " ";
+		}
+		cout << "\n";
+	}
+}
+
+int main() {
+	cin >> T;
+	while (T--) {
+		X = 1;	// 분대번호는 2번부터 매김
+		Y = 0;
+
+		// 지도 입력
+		cin >> N >> M;
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				cin >> map[i][j];
+			}
+		}
+
+		// 지도 탐색
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				int noSldr = 0;
+
+				// 병사가 아니거나 방문함
+				if (map[i][j] != 1) continue;
+
+				// 분대 번호
+				X++;
+
+				// BFS
+				queue<pair<int, int>> q;
+				q.push(make_pair(i, j));
+				map[i][j] = X;
+				noSldr++;
+
+				while (!q.empty()) {
+					int xIdx = q.front().first;
+					int yIdx = q.front().second;
+					q.pop();
+
+					for (int a = 0; a < ADJ; a++) {
+						int nx = xIdx + xpos[a];
+						int ny = yIdx + ypos[a];
+
+						// index out of range
+						if (!in_range(nx, ny)) continue;
+
+						// 병사가 아니거나 방문함
+						if (map[nx][ny] != 1) continue;
+
+						q.push(make_pair(nx, ny));
+						map[nx][ny] = X;
+						noSldr++;
+					}
+				}
+
+				// 병사 수 비교
+				if (Y < noSldr) Y = noSldr;
+			}
+		}
+
+		//print_map();
+		cout << X - 1 << ' ' << Y << '\n';
+	}
+}
