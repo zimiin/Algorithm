@@ -13,8 +13,6 @@ int minX = MAX, minY = MAX, maxX = 0, maxY = 0;
 int plane[MAX][MAX] = { 0 };
 int no = 1;
 
-bool origin = false;
-
 int nx[] = { 1, 0, -1, 0 };
 int ny[] = { 0, -1, 0, 1 };
 
@@ -57,7 +55,7 @@ int solution() {
 	}
 
 	// start from 0, 0
-	if (origin) {
+	if (plane[1000][1000] != 0) {
 		return no - 2;
 	}
 	else return no - 1;
@@ -80,18 +78,12 @@ void input() {
 
 		// 세로변 그리기
 		for (int y = Y1; y <= Y2; y++) {
-			if (y == 1000 && X1 == 1000) origin = true;
-			if (y == 1000 && X2 == 1000) origin = true;
-
 			plane[y][X1] = 1;
 			plane[y][X2] = 1;
 		}
 
 		// 가로변 그리기
 		for (int x = X1; x <= X2; x++) {
-			if (x == 1000 && Y1 == 1000) origin = true;
-			if (x == 1000 && Y2 == 1000) origin = true;
-
 			plane[Y1][x] = 1;
 			plane[Y2][x] = 1;
 		}
