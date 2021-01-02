@@ -12,7 +12,6 @@ int step[MAX];
 queue<int> q;
 
 int solution() {
-	if (S == G) return 0;
 	q.push(S);
 	step[S] = 0;
 
