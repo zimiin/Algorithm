@@ -13,6 +13,6 @@
 21! > 2<sup>63</sup> - 1 </br>
 </br>
 
-<b>Priority Queue</b></br>
+<b><ins>Priority Queue</ins></b></br>
 내림차순으로 pq 선언하기</br>
 priority_queue<int, vector<int>, greater<int> > pq;
