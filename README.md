@@ -13,10 +13,10 @@
 </br></br>
 <b><ins>Data Type Ranges</ins></b></br>
 int : -2,147,483,648 ~ 2,147,483,647</br>
-long long : -9,223,372,036,854,775,808 ~ 9,223,372,036,854,775,807</br>
-
+long long : -9,223,372,036,854,775,808 ~ 9,223,372,036,854,775,807
+</br></br>
 <b><ins>Priority Queue</ins></b></br>
-내림차순으로 pq 선언
+오름차순으로 pq 선언
 ```
 priority_queue<int, vector<int>, greater<int> > pq;
 ```
