@@ -1,5 +1,0 @@
-# Ignore everything
-*
-
-# but not cpp files
-!*.cpp
