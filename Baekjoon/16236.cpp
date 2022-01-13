@@ -132,7 +132,7 @@ int main() {
     sharkR = fishR;
     sharkC = fishC;
 
-    printSpace();
+    // printSpace();
     // cout << "sharkR " << sharkR << ", sharkC " << sharkC << endl;
     // cout << "sharkSize " << sharkSize << ", sharkAte " << sharkAte << endl;
     // cout << "time " << time << endl;
