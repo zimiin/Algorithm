@@ -1,167 +1,115 @@
-// 2021 KAKAO BLIND RECRUITMENT 카드 짝 맞추기
-
-const BOARD = new Array(4)
-let isRemainCard = new Array(7)
-let cardPos = new Array(7)
-let answer = 0
-
-function noRemainCard() {
-  let foundRemainCard = false
-
-  for (let i = 1; i < 7; i++) {
-    if (isRemainCard[i]) {
-      foundRemainCard = true
-      break
-    }
-  }
-
-  if (foundRemainCard) {
-    return false
-  } else {
-    return true
-  }
-}
-
-function countKeyPressBetween(pos1, pos2) {
-  const r1 = pos1[0]
-  const c1 = pos1[1]
-  const r2 = pos2[0]
-  const c2 = pos2[1]
-  const startR = Math.min(r1, r2)
-  const endR = Math.max(r1, r2)
-  const startC = Math.min(c1, c2)
-  const endC = Math.max(c1, c2)
-  let keyPress = 0
-
-  // row first
-  let cnt = 0
-  let beforeR = startR
-
-  for (let r = startR; r < endR;) {
-    let nextR
-    let hadACard = false
-
-    for (nextR = r + 1; nextR < endR; nextR++) {
-      let curCard = BOARD[nextR][c1]
-      if (isRemainCard[curCard]) {
-        hadACard = true
-        break
-      }
-    }
-
-    if (hadACard) {
-      cnt++
-      beforeR = nextR
-      r = nextR
-      continue
-    } else if (endR === 3) {
-      cnt++
-      break
-    } else if (nextR === endR) {
-      cnt += endR - beforeR
-    }
-  }
-
-  for (let c = startC + 1; c <= endC; c++) {
-    let curCard = BOARD[r2][c]
-    if (isRemainCard[curCard]) {
-      cnt++
-    }
-  }
-
-  keyPress = cnt
-
-  // col first
-  cnt = 0
-  let beforeC = startC
-
-  for (let c = startC; c < endC;) {
-    let nextC
-    let hadACard = false
-
-    for (nextC = c + 1; nextC < endC; nextC++) {
-      let curCard = BOARD[r1][nextC]
-      if (isRemainCard[curCard]) {
-        hadACard = true
-        break
-      }
-    }
-
-    if (hadACard) {
-      cnt++
-      beforeC = nextC
-      c = nextC
-      continue
-    } else if (endC === 3) {
-      cnt++
-      break
-    } else if (nextC === endC) {
-      cnt += endC - beforeC
-    }
-  }
-
-  for (let r = startR + 1; r <= endR; r++) {
-    let curCard = BOARD[r][c2]
-    if (isRemainCard[curCard]) {
-      keyPress++
-    }
-  }
-
-  keyPress = keyPress < cnt ? keyPress : cnt
-
-  return keyPress
-}
-
-function countKeyPress(curPos, nextPos, finalPos) {
-  return countKeyPressBetween(curPos, nextPos) + countKeyPressBetween(nextPos, finalPos) + 2
-}
-
-function recur(r, c, keyPress) {
-  if (noRemainCard()) {
-    if (answer === 0) {
-      answer = keyPress
-    } else if (keyPress < answer) {
-      answer = keyPress
-    }
-  }
-
-  for (let i = 1; i < 7; i++) {
-    if (isRemainCard[i] === false) {
-      continue
-    }
-
-    isRemainCard[i] = false
-
-    let curKeyPress = keyPress + countKeyPress([r, c], cardPos[0], cardPos[1])
-    recur(cardPos[1][0], cardPos[1][1], curKeyPress)
-
-    curKeyPress = keyPress + countKeyPress([r, c], cardPos[1], cardPos[0])
-    recur(cardPos[0][0], cardPos[0][1], curKeyPress)
-
-    isRemainCard[i] = true
-  }
-}
-
 function solution(board, r, c) {
-  for (let i = 0; i < 7; i++) {
-    remainCards[i] = false
-  }
+    const used = Array(7).fill(false)
+    let cards = new Set()
+    const cardPos = {}
+    
+    board.forEach((row, i) => {
+        row.forEach((cell, j) => {
+            if (cell !== 0) {
+                cards.add(cell)
+                cardPos[cell] = cardPos[cell] || []
+                cardPos[cell].push([i, j])    
+            }
+        })
+    })
+    
+    cards = [...cards]
+    
+    const countKeyPressBetween = (from, to) => {
+        const q = []
+        const visited = [...Array(4)].map(() => Array(4).fill(false))
+        const [nrPos, ncPos] = [[0, 0, 1, -1], [1, -1, 0, 0]]
+        const inRange = (r, c) => (0 <= r && r < 4 && 0 <= c && c < 4)
+        const arrived = (r, c) => (r === to[0] && c === to[1])
 
-  for (let i = 0; i < 4; i++) {
-    BOARD[i] = new Array(4)
-
-    for (let j = 0; j < 4; j++) {
-      BOARD[i][j] = board[i][j]
-
-      if (board[i][j] !== 0) {
-        let cur = board[i][j]
-        isRemainCard[cur] = true
-        cardPos.push([i, j])
-      }
+        q.push([from, 0])
+        visited[from[0]][from[1]] = true
+        
+        while (q.length) {
+            const [curPos, keyPress] = q.shift()
+            
+            if (arrived(curPos[0], curPos[1])) {
+                return keyPress
+            }
+            
+            for (let i = 0; i < 4; i++) {
+                const nr = curPos[0] + nrPos[i]
+                const nc = curPos[1] + ncPos[i]
+                
+                if (inRange(nr, nc) && !visited[nr][nc]) {
+                    q.push([[nr, nc], keyPress + 1])
+                    visited[nr][nc] = true
+                }
+                
+                let ctrlR = curPos[0]
+                let ctrlC = curPos[1]
+                
+                while (1) {
+                    let nextR = ctrlR + nrPos[i]
+                    let nextC = ctrlC + ncPos[i]
+                    
+                    if (!inRange(nextR, nextC)) {
+                        if (!visited[ctrlR][ctrlC]) {
+                            q.push([[ctrlR, ctrlC], keyPress + 1])
+                            visited[ctrlR][ctrlC] = true
+                        }
+                        break
+                    }
+                    
+                    if (board[nextR][nextC] > 0) {
+                        if (!visited[nextR][nextC]) {
+                            q.push([[nextR, nextC], keyPress + 1])
+                            visited[nextR][nextC] = true
+                        }
+                        break
+                    }
+                    
+                    ctrlR = nextR
+                    ctrlC = nextC
+                }
+            }
+        }
     }
-  }
-
-  recur(r, c, 0)
-
-  return answer
+    
+    const countKeyPress = (order, depth, curPos, keyPress) => {
+        if (depth === order.length) {
+            return keyPress    
+        }
+        
+        const card = order[depth]
+        const [card1Pos, card2Pos] = cardPos[card]
+        const [[c1r, c1c], [c2r, c2c]] = cardPos[card]
+        
+        const curKeyPress1 = countKeyPressBetween(curPos, card1Pos) + countKeyPressBetween(card1Pos, card2Pos) + 2
+        const curKeyPress2 = countKeyPressBetween(curPos, card2Pos) + countKeyPressBetween(card2Pos, card1Pos) + 2
+        
+        board[c1r][c1c] = board[c2r][c2c] = 0
+        const res = Math.min(countKeyPress(order, depth + 1, card2Pos, keyPress + curKeyPress1)
+                             , countKeyPress(order, depth + 1, card1Pos, keyPress + curKeyPress2))
+        board[c1r][c1c] = board[c2r][c2c] = card
+        
+        return res
+    }
+    
+    return (function f(order) {
+        if (order.length === cards.length) {
+            return countKeyPress(order, 0, [r, c], 0)
+        }
+        
+        let keyPress = 10000
+        
+        for (let i = 0; i < cards.length; i++) {
+            const card = cards[i]
+            
+            if (used[card]) {
+                continue
+            }
+            
+            used[card] = true
+            keyPress = Math.min(keyPress, f([...order, card]))
+            used[card] = false
+        }
+        
+        return keyPress
+    })([])
 }
