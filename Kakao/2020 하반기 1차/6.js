@@ -3,7 +3,6 @@ function solution(n, weak, dist) {
   const longWeak = Array(weak.length * 2)
   const picked = Array(numFriends).fill(0)
   const MAX = 1000
-  let ans = MAX
 
   for (let i = 0; i < weak.length; i++) {
     longWeak[i] = weak[i]
@@ -11,22 +10,14 @@ function solution(n, weak, dist) {
   }
 
   const getNextWeakIdx = (curWeakIdx, friendIdx) => {
-    let canGo = dist[friendIdx]
-    let before = longWeak[curWeakIdx]
-    let i = curWeakIdx
+    const canGo = dist[friendIdx]
+    const finalPos = longWeak[curWeakIdx] + canGo
+    let i
 
-    while (canGo >= 0) {
-      let diff
-      i++
-
-      if (i >= longWeak.length) {
-        return i
+    for (i = curWeakIdx + 1; i < longWeak.length; i++) {
+      if (finalPos < longWeak[i]) {
+        break
       }
-
-      diff = longWeak[i] - before
-
-      canGo -= diff
-      before = longWeak[i]
     }
 
     return i
@@ -53,6 +44,8 @@ function solution(n, weak, dist) {
 
     return minFriends
   }
+
+  let ans = MAX
 
   for (let startWeak = 0; startWeak < weak.length; startWeak++) {
     ans = Math.min(ans, cntFriends(startWeak, startWeak))
