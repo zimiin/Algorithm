@@ -24,26 +24,24 @@ function solution(nodeinfo) {
 
     const [left, right] = [[], []]
     const [x, y, no] = nodes[0]
-
-    pre.push(no)
-
+    
     for (let node of nodes) {
       const [cx, cy, cno] = node
-
+      
       if (cx === x) {
         continue
       }
-
+      
       if (cx < x) {
         left.push(node)
       } else {
         right.push(node)
       }
     }
-
+    
+    pre.push(no)
     order(left)
     order(right)
-
     post.push(no)
   }
 
