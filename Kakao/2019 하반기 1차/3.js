@@ -1,35 +1,43 @@
 // 후보키
 
 function solution(relation) {
-  let answer = 0
-  const keys = new Map()
-  const inKey = new Array(relation.length)
+  const columnCnt = relation[0].length
+  const candidateKeys = []
 
-  for (let i = 0; i < inKey.length; i++) {
-    inKey[i] = false
-  }
-
-  const getKey = () => {
+  const getKey = (indexes) => {
     let key = ''
 
-    for (let i = 0; i < inKey.length; i++) {
-      if (inKey[i]) {
-        key += i
-      }
+    for (let index of indexes) {
+      key += index
     }
 
     return key
   }
 
+  const recur = (keys, indexes, index, len, cnt) => {
+    if (len === cnt) {
+      keys.push(getKey(indexes))
+      return
+    }
+
+    if (index >= columnCnt) {
+      return
+    }
+
+    indexes.push(index)
+    recur(keys, indexes, index + 1, len, cnt + 1)
+    indexes.pop()
+    recur(keys, indexes, index + 1, len, cnt)
+  }
+
   const isUnique = (key) => {
-    const indexes = [...key].map((e) => parseInt(e))
     const map = new Map()
+    const indexes = [...key].map((e) => parseInt(e))
 
-    for (let i = 0; i < relation.length; i++) {
+    for (let r of relation) {
       let k = ''
-
-      for (let index of indexes) {
-        key += relation[i][index]
+      for (let i of indexes) {
+        k += r[i]
       }
 
       if (map.get(k)) {
@@ -43,26 +51,42 @@ function solution(relation) {
   }
 
   const isMinimal = (key) => {
+    for (let ck of candidateKeys) {
+      let cnt = 0
 
+      for (let i = 0; i < ck.length; i++) {
+        const res = key.search(ck.charAt(i))
+        if (res > -1) {
+          cnt++
+        }
+      }
+
+      if (cnt === ck.length) {
+        return false
+      }
+    }
+    return true
   }
 
-  (function recur(index) {
-    if (index === relation.length) {
-      const key = getKey()
-      if (key === '') {
-        return
+  for (let len = 1; len <= columnCnt; len++) {
+    const keys = []
+    // const recur = (keys, indexes, index, len, cnt) => {}
+    recur(keys, [], 0, len, 0)
+
+    const minimalKeys = []
+
+    for (let key of keys) {
+      if (isMinimal(key)) {
+        minimalKeys.push(key)
       }
-      if (isUnique(key) && isMinimal(key)) {
-        answer++
-      }
-      return
     }
 
-    inKey[index] = true
-    recur(index + 1)
-    inKey[index] = false
-    recur(index + 1)
-  })(0);
+    for (let mk of minimalKeys) {
+      if (isUnique(mk)) {
+        candidateKeys.push(mk)
+      }
+    }
+  }
 
-  return answer
+  return candidateKeys.length
 }
